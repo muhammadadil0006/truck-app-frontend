@@ -1,5 +1,5 @@
 import { DUTY_STATUS_ROW_ORDER, type DutyStatus } from "../constants/dutyStatus";
-import type { LogSegment } from "../features/trips/types";
+import type { LogSegment, Transition } from "../features/trips/types";
 
 export interface GridGeometry {
   width: number;
@@ -80,14 +80,15 @@ export interface StatusChangePoint {
   location: string;
 }
 
-export function getStatusChangePoints(
-  segments: LogSegment[],
-  geometry: GridGeometry
-): StatusChangePoint[] {
-  return segments.map((s) => ({
-    x: timeToX(s.start_time, geometry),
-    y: geometry.rowY[s.status],
-    status: s.status,
-    location: s.location_text,
+/** One dot per REAL duty-status change that day, from the backend's
+ * explicit transitions list — not derived from adjacent segments, so a day
+ * that opens mid-reset (same status continuing from before midnight)
+ * correctly shows no dot at Midnight. */
+export function getTransitionPoints(transitions: Transition[], geometry: GridGeometry): StatusChangePoint[] {
+  return transitions.map((t) => ({
+    x: timeToX(t.time, geometry),
+    y: geometry.rowY[t.to_status],
+    status: t.to_status,
+    location: t.location_text,
   }));
 }

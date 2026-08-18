@@ -51,6 +51,22 @@ export interface LogSegment {
   remarks: string;
 }
 
+/** One duty-status change. Unlike LogSegment, this is computed on the raw
+ * pre-midnight-split segment list on the backend — a segment that merely
+ * crosses midnight without its status changing (e.g. an overnight 10-hr
+ * reset) is NOT a transition. Use this (not adjacent LogSegments) to place
+ * the grid's row-change dots and Remarks entries, so a day that starts
+ * mid-reset doesn't show a spurious change at midnight. */
+export interface Transition {
+  time: string; // ISO 8601
+  from_status: DutyStatus | null; // null only for the very first transition of the trip
+  to_status: DutyStatus;
+  location_text: string;
+  lat: number;
+  lng: number;
+  remarks: string;
+}
+
 export interface DailyLog {
   day_index: number;
   log_date: string; // "YYYY-MM-DD"
@@ -63,6 +79,7 @@ export interface DailyLog {
   recap_b_available_tomorrow: number;
   recap_c_last_8_days_if_restart: number;
   segments: LogSegment[];
+  transitions: Transition[];
 }
 
 export type TripStatus = "completed" | "failed";

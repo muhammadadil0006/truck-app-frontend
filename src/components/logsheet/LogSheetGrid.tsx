@@ -1,15 +1,16 @@
 import { useMemo } from "react";
 
 import { DUTY_STATUS_LABEL, DUTY_STATUS_ROW_ORDER, type DutyStatus } from "../../constants/dutyStatus";
-import type { LogSegment } from "../../features/trips/types";
+import type { LogSegment, Transition } from "../../features/trips/types";
 import {
   buildStatusLinePath,
   computeGridGeometry,
-  getStatusChangePoints,
+  getTransitionPoints,
 } from "../../utils/logSheetGeometry";
 
 export interface LogSheetGridProps {
   segments: LogSegment[]; // segments belonging to exactly one day
+  transitions: Transition[]; // real duty-status changes that day (see getTransitionPoints)
   /** Total hours logged in each duty status today — rendered in the "Total
    * Hours" column at the right of the grid, per CLAUDE.md's requirement
    * that each row's total be written at the right side of the grid. */
@@ -23,10 +24,10 @@ const HOUR_LABELS = [
   "Noon", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23",
 ];
 
-export function LogSheetGrid({ segments, totals, width = 920, height = 180 }: LogSheetGridProps) {
+export function LogSheetGrid({ segments, transitions, totals, width = 920, height = 180 }: LogSheetGridProps) {
   const geometry = useMemo(() => computeGridGeometry(width, height), [width, height]);
   const linePath = useMemo(() => buildStatusLinePath(segments, geometry), [segments, geometry]);
-  const changePoints = useMemo(() => getStatusChangePoints(segments, geometry), [segments, geometry]);
+  const changePoints = useMemo(() => getTransitionPoints(transitions, geometry), [transitions, geometry]);
   const gridRight = width - geometry.padRight;
 
   return (
@@ -127,8 +128,8 @@ export function LogSheetGrid({ segments, totals, width = 920, height = 180 }: Lo
 
       {/* the continuous stepped duty-status path */}
       <path d={linePath} fill="none" stroke="black" strokeWidth={2} />
-      {changePoints.map((p) => (
-        <circle key={`${p.x}-${p.status}`} cx={p.x} cy={p.y} r={2.5} fill="black" />
+      {changePoints.map((p, i) => (
+        <circle key={`${p.x}-${p.status}-${i}`} cx={p.x} cy={p.y} r={2.5} fill="black" />
       ))}
     </svg>
   );

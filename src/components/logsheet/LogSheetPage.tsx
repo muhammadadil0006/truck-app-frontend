@@ -41,13 +41,13 @@ export function LogSheetPage({ trip, dailyLog }: LogSheetPageProps) {
         </div>
       </div>
 
-      <LogSheetGrid segments={dailyLog.segments} totals={totals} />
+      <LogSheetGrid segments={dailyLog.segments} transitions={dailyLog.transitions} totals={totals} />
 
       <div>
         <p className="mb-1 text-xs font-semibold uppercase text-gray-500">
           Remarks (pickup, dropoff, breaks, rest, fuel, and location at every duty-status change)
         </p>
-        <RemarksList segments={dailyLog.segments} />
+        <RemarksList transitions={dailyLog.transitions} />
       </div>
     </div>
   );
