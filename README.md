@@ -44,7 +44,7 @@ frontend/src/
 │   └── components/LocationAutocomplete.tsx  # location fields — see below
 ├── components/
 │   ├── map/              # RouteMap (react-leaflet) + marker icons/popups
-│   ├── logsheet/         # LogSheetGrid (hand-rolled SVG), pager, recap boxes, remarks
+│   ├── logsheet/         # LogSheetGrid (hand-rolled SVG), pager, remarks
 │   └── ui/               # Button, Spinner, ErrorBanner
 └── utils/                # pure functions: log-sheet geometry, geo/time/format helpers, form validation
 ```

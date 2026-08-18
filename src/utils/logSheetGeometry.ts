@@ -5,6 +5,7 @@ export interface GridGeometry {
   width: number;
   height: number;
   padLeft: number;
+  padRight: number;
   padTop: number;
   hourWidth: number;
   rowHeight: number;
@@ -12,14 +13,16 @@ export interface GridGeometry {
 }
 
 const DEFAULT_PAD_LEFT = 140;
+const DEFAULT_PAD_RIGHT = 56; // reserved for the per-row "Total Hours" column, matching the real form
 const DEFAULT_PAD_TOP = 20;
 const HOURS_PER_DAY = 24;
 const MINUTES_PER_DAY = 1440;
 
 export function computeGridGeometry(width: number, height: number): GridGeometry {
   const padLeft = DEFAULT_PAD_LEFT;
+  const padRight = DEFAULT_PAD_RIGHT;
   const padTop = DEFAULT_PAD_TOP;
-  const hourWidth = (width - padLeft) / HOURS_PER_DAY;
+  const hourWidth = (width - padLeft - padRight) / HOURS_PER_DAY;
   const rowHeight = (height - padTop) / DUTY_STATUS_ROW_ORDER.length;
 
   const rowY = {} as Record<DutyStatus, number>;
@@ -27,7 +30,7 @@ export function computeGridGeometry(width: number, height: number): GridGeometry
     rowY[status] = padTop + rowHeight * i + rowHeight / 2;
   });
 
-  return { width, height, padLeft, padTop, hourWidth, rowHeight, rowY };
+  return { width, height, padLeft, padRight, padTop, hourWidth, rowHeight, rowY };
 }
 
 /** Minutes since local midnight for an ISO 8601 timestamp. Segments are
