@@ -1,10 +1,39 @@
 import { useState } from "react";
-import { BedDouble } from "lucide-react";
 import clsx from "clsx";
 
-import type { Trip } from "../../features/trips/types";
+import { DUTY_STATUS_COLOR, DUTY_STATUS_ROW_ORDER, DutyStatus, DUTY_STATUS_LABEL } from "../../constants/dutyStatus";
+import type { DailyLog, Trip } from "../../features/trips/types";
 import { formatDate } from "../../utils/time";
 import { LogSheetPage } from "./LogSheetPage";
+
+const DAY_TOTAL_KEY: Record<DutyStatus, keyof DailyLog> = {
+  [DutyStatus.OffDuty]: "total_off_duty_hours",
+  [DutyStatus.SleeperBerth]: "total_sleeper_berth_hours",
+  [DutyStatus.Driving]: "total_driving_hours",
+  [DutyStatus.OnDutyNotDriving]: "total_on_duty_hours",
+};
+
+/** Proportional 24-hr duty-mix bar — a glanceable summary so every day card
+ * carries real signal (not just a date), letting a driver scan the whole
+ * trip's rest/drive rhythm before opening any single sheet. */
+function DutyMixBar({ log }: { log: DailyLog }) {
+  return (
+    <div className="flex h-1.5 w-full overflow-hidden rounded-full bg-ink-900">
+      {DUTY_STATUS_ROW_ORDER.map((status) => {
+        const hours = Number(log[DAY_TOTAL_KEY[status]] ?? 0);
+        const pct = (hours / 24) * 100;
+        if (pct <= 0) return null;
+        return (
+          <span
+            key={status}
+            style={{ width: `${pct}%`, background: DUTY_STATUS_COLOR[status] }}
+            title={`${DUTY_STATUS_LABEL[status]}: ${hours.toFixed(1)}h`}
+          />
+        );
+      })}
+    </div>
+  );
+}
 
 export function LogSheetPager({ trip }: { trip: Trip }) {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -16,24 +45,34 @@ export function LogSheetPager({ trip }: { trip: Trip }) {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap gap-1.5 rounded-xl border border-ink-700 bg-ink-800/40 p-1.5">
+      <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
         {dailyLogs.map((log, i) => {
-          const isRest = log.total_driving_hours === 0;
           const isActive = i === activeIndex;
+          const isRest = log.total_driving_hours === 0;
           return (
             <button
               key={log.day_index}
               onClick={() => setActiveIndex(i)}
               className={clsx(
-                "flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-display text-xs font-semibold tracking-wide whitespace-nowrap transition-all duration-200",
+                "flex flex-col gap-2 rounded-xl border p-3 text-left transition-all duration-200",
                 isActive
-                  ? "bg-teal-500/15 text-teal-300 shadow-[inset_0_0_0_1px_rgba(22,186,189,0.35)]"
-                  : "text-ink-300 hover:bg-ink-700/60 hover:text-ink-50"
+                  ? "border-teal-400/60 bg-teal-500/10 shadow-glow"
+                  : "border-ink-700 bg-ink-800/40 hover:-translate-y-0.5 hover:border-ink-500 hover:bg-ink-800/70"
               )}
             >
-              Day {log.day_index}
-              <span className="font-mono font-normal text-ink-400">{formatDate(log.log_date)}</span>
-              {isRest && <BedDouble className="size-3 text-teal-400" aria-hidden />}
+              <div className="flex items-center justify-between">
+                <span className={clsx("font-display text-sm font-bold", isActive ? "text-teal-300" : "text-ink-100")}>
+                  Day {log.day_index}
+                </span>
+                {isRest && (
+                  <span className="rounded bg-ink-700 px-1.5 py-0.5 font-display text-[9px] font-semibold tracking-wider text-ink-300 uppercase">
+                    Rest
+                  </span>
+                )}
+              </div>
+              <span className="font-mono text-[11px] text-ink-400">{formatDate(log.log_date)}</span>
+              <DutyMixBar log={log} />
+              <span className="font-mono text-xs text-ink-300">{log.total_driving_hours.toFixed(1)}h driving</span>
             </button>
           );
         })}

@@ -16,6 +16,7 @@ export interface LocationAutocompleteProps {
   onChange: (location: ResolvedLocation | null) => void;
   error?: string;
   icon?: ReactNode;
+  className?: string;
 }
 
 const MIN_QUERY_LENGTH = 3;
@@ -38,6 +39,7 @@ export function LocationAutocomplete({
   onChange,
   error,
   icon,
+  className,
 }: LocationAutocompleteProps) {
   const [inputText, setInputText] = useState(value?.text ?? "");
   const [isFocused, setIsFocused] = useState(false);
@@ -66,7 +68,7 @@ export function LocationAutocomplete({
   const showDropdown = showPopularCities || showLiveResults;
 
   return (
-    <div className={clsx("relative", showDropdown && "z-30")}>
+    <div className={clsx("relative", showDropdown && "z-30", className)}>
       <label htmlFor={id} className="mb-1.5 block font-display text-xs font-semibold tracking-wider text-ink-300 uppercase">
         {label}
       </label>

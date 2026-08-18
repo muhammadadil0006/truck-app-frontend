@@ -21,7 +21,7 @@ export function TripDetailPage() {
             <ArrowLeft className="size-3.5" aria-hidden />
             Back to history
           </Link>
-          <h1 className="font-display text-3xl font-bold tracking-tight text-ink-50">Trip Detail</h1>
+          <h1 className="font-display text-4xl font-bold tracking-tight text-ink-50">Trip Detail</h1>
         </div>
       </div>
 

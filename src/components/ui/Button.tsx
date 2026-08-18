@@ -22,7 +22,7 @@ export function Button({
   return (
     <button
       className={clsx(
-        "group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-xl px-5 py-2.5 font-display text-sm font-semibold tracking-wide uppercase transition-all duration-200 ease-out",
+        "group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-xl px-5 py-2.5 font-display text-base font-bold tracking-wider uppercase transition-all duration-200 ease-out",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:ring-offset-2 focus-visible:ring-offset-ink-900",
         "disabled:pointer-events-none disabled:opacity-50",
         variant === "primary" &&

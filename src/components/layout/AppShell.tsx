@@ -22,7 +22,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               <Truck className="size-5" aria-hidden />
             </span>
             <span className="leading-none">
-              <span className="block font-display text-lg font-bold tracking-wide text-ink-50">CONVOY</span>
+              <span className="block font-display text-xl font-bold tracking-wider text-ink-50">CONVOY</span>
               <span className="block text-[10px] font-medium tracking-[0.2em] text-teal-400 uppercase">
                 HOS Trip Planner
               </span>

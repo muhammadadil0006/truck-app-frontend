@@ -30,8 +30,8 @@
   --color-teal-200: #a6e6e2;
   --color-teal-100: #d3f4f0;
 
-  --font-sans: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
-  --font-display: "Chakra Petch", system-ui, sans-serif;
+  --font-sans: "Barlow", system-ui, -apple-system, sans-serif;
+  --font-display: "Barlow Condensed", system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", monospace;
 
   --shadow-glow: 0 0 0 1px rgba(22, 186, 189, 0.25), 0 0 24px -4px rgba(22, 186, 189, 0.35);
@@ -46,6 +46,7 @@
   --animate-shimmer: shimmer 2.5s linear infinite;
   --animate-dash-draw: dash-draw 0.7s ease-out forwards;
   --animate-spin-slow: spin 2.4s linear infinite;
+  --animate-truck-bounce: truck-bounce 0.6s ease-in-out infinite;
 }
 
 @keyframes fade-up {
@@ -101,6 +102,15 @@
     stroke-dashoffset: 0;
   }
 }
+@keyframes truck-bounce {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-4px) rotate(-2deg);
+  }
+}
 
 /* Stagger children of any `.stagger` container using their DOM order — used
    for the trip form fields and stat tiles reveal-on-mount. */
@@ -154,6 +164,56 @@ body {
       transparent 1px,
       transparent 64px
     );
+}
+
+/* Cycle-hours slider — a native range input, restyled. `--fill` (set inline
+   per render from value/max) draws the filled portion of the track; Firefox
+   gets the same effect natively via ::-moz-range-progress. */
+.hos-slider {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  height: 0.375rem;
+  border-radius: 999px;
+  background: linear-gradient(
+    to right,
+    var(--slider-color, var(--color-teal-500)) var(--fill, 0%),
+    var(--color-ink-600) var(--fill, 0%)
+  );
+  outline: none;
+  cursor: pointer;
+}
+.hos-slider::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1.125rem;
+  height: 1.125rem;
+  border-radius: 50%;
+  background: var(--slider-color, var(--color-teal-400));
+  border: 3px solid var(--color-ink-900);
+  box-shadow: 0 0 0 1px rgba(22, 186, 189, 0.4), 0 2px 6px rgba(0, 0, 0, 0.5);
+  transition: transform 0.15s ease-out;
+}
+.hos-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+.hos-slider::-moz-range-thumb {
+  width: 1.125rem;
+  height: 1.125rem;
+  border-radius: 50%;
+  background: var(--slider-color, var(--color-teal-400));
+  border: 3px solid var(--color-ink-900);
+  box-shadow: 0 0 0 1px rgba(22, 186, 189, 0.4), 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+.hos-slider::-moz-range-track {
+  height: 0.375rem;
+  border-radius: 999px;
+  background: var(--color-ink-600);
+}
+.hos-slider::-moz-range-progress {
+  height: 0.375rem;
+  border-radius: 999px;
+  background: var(--slider-color, var(--color-teal-500));
 }
 
 /* Custom scrollbar to match the dark shell. */

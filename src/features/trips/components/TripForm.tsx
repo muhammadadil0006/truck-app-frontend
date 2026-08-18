@@ -1,21 +1,22 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import type { FormEvent } from "react";
-import { Gauge, MapPin, Navigation, Send } from "lucide-react";
+import { MapPin, Navigation, Send } from "lucide-react";
 
 import { Button } from "../../../components/ui/Button";
 import { ErrorBanner } from "../../../components/ui/ErrorBanner";
-import { MAX_CYCLE_HOURS } from "../../../constants/hos";
 import { validateTripForm, type TripFormErrors, type TripFormState } from "../../../utils/validateTripForm";
+import { CycleHoursInput } from "./CycleHoursInput";
 import { LocationAutocomplete } from "./LocationAutocomplete";
-import { TripFormField } from "./TripFormField";
 import type { PlanTripRequest } from "../types";
 
 const INITIAL_STATE: TripFormState = {
   currentLocation: null,
   pickupLocation: null,
   dropoffLocation: null,
-  cycleUsedHrs: "",
+  cycleUsedHrs: "0",
 };
+
+const ROUTE_WAYPOINTS = ["Current", "Pickup", "Dropoff"];
 
 export interface TripFormProps {
   onSubmit: (request: PlanTripRequest) => void;
@@ -58,9 +59,44 @@ export function TripForm({ onSubmit, isLoading, errorMessage }: TripFormProps) {
       onSubmit={handleSubmit}
       className="animate-fade-up relative space-y-5 rounded-2xl border border-ink-700 bg-ink-800/40 p-6 shadow-panel backdrop-blur-sm sm:p-7"
     >
-      <div className="pointer-events-none absolute inset-x-4 top-0 h-px bg-gradient-to-r from-transparent via-teal-400/70 to-transparent" />
+      {/* Decorative line texture (spotter.ai's diagonal-line motif), clipped
+          to the card's own rounded corners — isolated in its own overflow
+          layer so it never clips the location dropdowns rendered below. */}
+      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden rounded-2xl">
+        <div
+          className="absolute inset-0 opacity-[0.06]"
+          style={{
+            backgroundImage:
+              "repeating-linear-gradient(115deg, white 0px, white 1px, transparent 1px, transparent 28px)",
+          }}
+        />
+        <div className="absolute inset-x-4 top-0 h-px bg-gradient-to-r from-transparent via-teal-400/70 to-transparent" />
+      </div>
 
-      <div className="stagger grid gap-4 sm:grid-cols-2">
+      {/* Route waypoint stepper — Current → Pickup → Dropoff, with an
+          animated marching-dash connector echoing the trip's route line. */}
+      <div className="relative flex items-center gap-2">
+        {ROUTE_WAYPOINTS.map((label, i) => (
+          <Fragment key={label}>
+            <span className="flex shrink-0 items-center gap-1.5 font-display text-[10px] font-semibold tracking-widest text-teal-300/90 uppercase">
+              <span className="size-1.5 rounded-full bg-teal-400 shadow-glow" aria-hidden />
+              {label}
+            </span>
+            {i < ROUTE_WAYPOINTS.length - 1 && (
+              <span
+                className="h-px min-w-6 flex-1 animate-shimmer"
+                style={{
+                  backgroundImage: "repeating-linear-gradient(to right, var(--color-teal-500) 0 6px, transparent 6px 14px)",
+                  backgroundSize: "200% 100%",
+                }}
+                aria-hidden
+              />
+            )}
+          </Fragment>
+        ))}
+      </div>
+
+      <div className="stagger relative grid gap-4 sm:grid-cols-2">
         <LocationAutocomplete
           id="currentLocation"
           label="Current location"
@@ -87,26 +123,26 @@ export function TripForm({ onSubmit, isLoading, errorMessage }: TripFormProps) {
           onChange={(loc) => setForm((prev) => ({ ...prev, dropoffLocation: loc }))}
           error={errors.dropoffLocation}
           icon={<MapPin className="size-4" aria-hidden />}
+          className="sm:col-span-2"
         />
-        <TripFormField
+
+        <CycleHoursInput
           id="cycleUsedHrs"
-          label="Current cycle used (hrs)"
-          type="number"
-          min={0}
-          max={MAX_CYCLE_HOURS}
-          step={0.5}
-          placeholder="e.g. 10"
           value={form.cycleUsedHrs}
-          onChange={(e) => setForm((prev) => ({ ...prev, cycleUsedHrs: e.target.value }))}
+          onChange={(v) => setForm((prev) => ({ ...prev, cycleUsedHrs: v }))}
           error={errors.cycleUsedHrs}
-          helperText={`Hours already logged on-duty in the rolling ${MAX_CYCLE_HOURS}-hr/8-day cycle. Past ${MAX_CYCLE_HOURS}, a 34-hr restart is scheduled automatically.`}
-          icon={<Gauge className="size-4" aria-hidden />}
         />
       </div>
 
       {errorMessage && <ErrorBanner message={errorMessage} />}
 
-      <Button type="submit" isLoading={isLoading} loadingText="Planning trip…" className="w-full" icon={<Send className="size-4" aria-hidden />}>
+      <Button
+        type="submit"
+        isLoading={isLoading}
+        loadingText="Planning trip…"
+        className="relative w-full"
+        icon={<Send className="size-4" aria-hidden />}
+      >
         Plan Trip
       </Button>
     </form>

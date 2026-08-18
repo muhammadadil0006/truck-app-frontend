@@ -2,6 +2,7 @@ import { useMemo } from "react";
 
 import { SHOW_DEBUG_PANEL } from "../../constants/debug";
 import { DutyStatus } from "../../constants/dutyStatus";
+import { MAX_CYCLE_HOURS, RESTART_HOURS } from "../../constants/hos";
 import { LOG_SHEET_DEFAULTS } from "../../constants/logSheetDefaults";
 import type { DailyLog, Trip } from "../../features/trips/types";
 import { formatDate } from "../../utils/time";
@@ -74,10 +75,41 @@ export function LogSheetPage({ trip, dailyLog }: LogSheetPageProps) {
             </p>
             <RemarksList transitions={dailyLog.transitions} />
           </div>
+
+          <RecapBoxes dailyLog={dailyLog} />
         </div>
       </div>
 
       {SHOW_DEBUG_PANEL && <TransitionsDebugPanel transitions={dailyLog.transitions} />}
+    </div>
+  );
+}
+
+/** Recap boxes per CLAUDE.md's 70/8-day schedule spec — on-duty hours today,
+ * plus the A/B/C rolling-window figures the backend already computes. */
+function RecapBoxes({ dailyLog }: { dailyLog: DailyLog }) {
+  const onDutyToday = dailyLog.total_driving_hours + dailyLog.total_on_duty_hours;
+  const boxes = [
+    { label: "On duty today", value: onDutyToday },
+    { label: "A. Last 7 days incl. today", value: dailyLog.recap_a_last_7_days },
+    { label: "B. Available tomorrow", value: dailyLog.recap_b_available_tomorrow },
+    { label: "C. Last 8 days if restart taken", value: dailyLog.recap_c_last_8_days_if_restart },
+  ];
+
+  return (
+    <div className="border-t border-ink-200 pt-3">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        {boxes.map(({ label, value }) => (
+          <div key={label} className="rounded-lg border border-ink-200 bg-ink-50 px-2.5 py-2">
+            <p className="font-mono text-lg leading-tight font-semibold text-ink-900">{value.toFixed(1)}</p>
+            <p className="text-[10px] leading-tight text-ink-500">{label}</p>
+          </div>
+        ))}
+      </div>
+      <p className="mt-2 text-[11px] text-ink-500 italic">
+        If {RESTART_HOURS} consecutive hours off duty are taken, {MAX_CYCLE_HOURS} hours become available under the
+        70-hr/8-day cycle.
+      </p>
     </div>
   );
 }
