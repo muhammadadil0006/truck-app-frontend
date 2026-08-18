@@ -1,7 +1,7 @@
 import { Provider } from "react-redux";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import { store } from "./app/store";
+import { store } from "./store/store";
 import { AppShell } from "./components/layout/AppShell";
 import { PlanTripPage } from "./features/trips/pages/PlanTripPage";
 import { TripHistoryPage } from "./features/trips/pages/TripHistoryPage";

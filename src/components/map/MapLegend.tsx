@@ -12,9 +12,7 @@ const STOP_TYPE_ICON = {
 
 const LEGEND_ORDER = Object.values(StopType);
 
-/** Explains the map's pin colors/icons — same glyphs as markerIcons.ts,
- * as React components instead of hand-built SVG strings (that copy lives
- * inside Leaflet's divIcon HTML, which can't render React). */
+
 export function MapLegend() {
   return (
     <aside className="w-full shrink-0 rounded-2xl border border-ink-700 bg-ink-800/40 p-4 shadow-panel sm:w-52">

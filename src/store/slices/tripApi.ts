@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 import { API_BASE_URL } from "../../constants/api";
 import { getGuestId } from "../../utils/guestId";
-import type { GeocodeSuggestion, PlanTripRequest, Trip, TripListItem } from "./types";
+import type { GeocodeSuggestion, PlanTripRequest, Trip, TripListItem } from "../../features/trips/types";
 
 export const tripApi = createApi({
   reducerPath: "tripApi",

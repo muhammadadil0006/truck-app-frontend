@@ -5,7 +5,7 @@ import clsx from "clsx";
 
 import { POPULAR_CITIES } from "../../../constants/popularCities";
 import { useDebouncedValue } from "../../../utils/useDebouncedValue";
-import { useAutocompleteLocationQuery } from "../tripApi";
+import { useAutocompleteLocationQuery } from "../../../store/slices/tripApi";
 import type { GeocodeSuggestion, ResolvedLocation } from "../types";
 
 export interface LocationAutocompleteProps {

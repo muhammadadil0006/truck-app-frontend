@@ -1,6 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 
-import { tripApi } from "../features/trips/tripApi";
+import { tripApi } from "./slices/tripApi";
 
 // RTK Query only — no plain Redux slices. usePlanTripMutation/useGetTripQuery/
 // useListTripsQuery already expose loading/error/data state; mirroring that

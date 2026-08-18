@@ -10,7 +10,7 @@ import { buildStopIcon } from "./markerIcons";
 import { StopPopupContent } from "./StopPopupContent";
 
 export interface RouteMapProps {
-  routeGeometry: [number, number][]; // GeoJSON [lng, lat] pairs from the backend
+  routeGeometry: [number, number][];
   stops: Stop[];
 }
 
