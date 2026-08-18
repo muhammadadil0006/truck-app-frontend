@@ -1,16 +1,16 @@
 import { useMemo } from "react";
 
 import { DUTY_STATUS_LABEL, DUTY_STATUS_ROW_ORDER, type DutyStatus } from "../../constants/dutyStatus";
-import type { LogSegment, Transition } from "../../features/trips/types";
-import {
-  buildStatusLinePath,
-  computeGridGeometry,
-  getTransitionPoints,
-} from "../../utils/logSheetGeometry";
+import type { Transition } from "../../features/trips/types";
+import { buildDayLines, computeGridGeometry } from "../../utils/logSheetGeometry";
 
 export interface LogSheetGridProps {
-  segments: LogSegment[]; // segments belonging to exactly one day
-  transitions: Transition[]; // real duty-status changes that day (see getTransitionPoints)
+  /** Every transition of the WHOLE trip (all days flattened) — this day's
+   * lines are derived by clipping each transition's run (until the next
+   * transition) to [this day's midnight, next midnight), so a status that
+   * started on an earlier day still draws its correct continuation here. */
+  allTransitions: Transition[];
+  logDate: string; // "YYYY-MM-DD" — which day this grid renders
   /** Total hours logged in each duty status today — rendered in the "Total
    * Hours" column at the right of the grid, per CLAUDE.md's requirement
    * that each row's total be written at the right side of the grid. */
@@ -24,11 +24,13 @@ const HOUR_LABELS = [
   "Noon", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23",
 ];
 
-export function LogSheetGrid({ segments, transitions, totals, width = 920, height = 180 }: LogSheetGridProps) {
+export function LogSheetGrid({ allTransitions, logDate, totals, width = 920, height = 180 }: LogSheetGridProps) {
   const geometry = useMemo(() => computeGridGeometry(width, height), [width, height]);
-  const linePath = useMemo(() => buildStatusLinePath(segments, geometry), [segments, geometry]);
-  const changePoints = useMemo(() => getTransitionPoints(transitions, geometry), [transitions, geometry]);
-  const gridRight = width - geometry.padRight;
+  const { segmentLines, connectorLines, changePoints } = useMemo(
+    () => buildDayLines(allTransitions, logDate, geometry),
+    [allTransitions, logDate, geometry]
+  );
+  const gridRight = geometry.gridRight;
 
   return (
     <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label="24-hour duty status log" className="w-full">
@@ -50,7 +52,10 @@ export function LogSheetGrid({ segments, transitions, totals, width = 920, heigh
         Total
       </text>
 
-      {/* row separator lines */}
+      {/* row separator lines — purely structural (like a paper log's
+          pre-printed template), drawn for all 24hrs regardless of data.
+          Dashed, not solid: a solid stroke on this grid must only ever mean
+          real duty-status data, never be confused with a printed ruling. */}
       {DUTY_STATUS_ROW_ORDER.map((status, i) => (
         <line
           key={`row-${status}`}
@@ -58,11 +63,20 @@ export function LogSheetGrid({ segments, transitions, totals, width = 920, heigh
           x2={gridRight}
           y1={geometry.padTop + geometry.rowHeight * i}
           y2={geometry.padTop + geometry.rowHeight * i}
-          stroke="#999"
+          stroke="#d1d5db"
           strokeWidth={1}
+          strokeDasharray="1 3"
         />
       ))}
-      <line x1={geometry.padLeft} x2={gridRight} y1={height} y2={height} stroke="#999" strokeWidth={1} />
+      <line
+        x1={geometry.padLeft}
+        x2={gridRight}
+        y1={height}
+        y2={height}
+        stroke="#d1d5db"
+        strokeWidth={1}
+        strokeDasharray="1 3"
+      />
 
       {/* per-row total hours, right of the grid */}
       {DUTY_STATUS_ROW_ORDER.map((status, i) => (
@@ -126,8 +140,14 @@ export function LogSheetGrid({ segments, transitions, totals, width = 920, heigh
         );
       })}
 
-      {/* the continuous stepped duty-status path */}
-      <path d={linePath} fill="none" stroke="black" strokeWidth={2} />
+      {/* duty-status data: one horizontal line per segment (its own row,
+          its own exact time span), one vertical line per real transition */}
+      {segmentLines.map((l, i) => (
+        <line key={`seg-${i}-${l.status}`} x1={l.x1} x2={l.x2} y1={l.y} y2={l.y} stroke="black" strokeWidth={2} />
+      ))}
+      {connectorLines.map((c, i) => (
+        <line key={`conn-${i}-${c.x}`} x1={c.x} x2={c.x} y1={c.y1} y2={c.y2} stroke="black" strokeWidth={2} />
+      ))}
       {changePoints.map((p, i) => (
         <circle key={`${p.x}-${p.status}-${i}`} cx={p.x} cy={p.y} r={2.5} fill="black" />
       ))}
