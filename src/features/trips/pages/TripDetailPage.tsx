@@ -2,7 +2,7 @@ import { Link, useParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 
 import { ErrorBanner } from "../../../components/ui/ErrorBanner";
-import { Spinner } from "../../../components/ui/Spinner";
+import { TripPlanningAnimation } from "../components/TripPlanningAnimation";
 import { TripResults } from "../components/TripResults";
 import { useGetTripQuery } from "../tripApi";
 
@@ -25,11 +25,7 @@ export function TripDetailPage() {
         </div>
       </div>
 
-      {isLoading && (
-        <div className="flex justify-center py-10">
-          <Spinner label="Loading trip…" />
-        </div>
-      )}
+      {isLoading && <TripPlanningAnimation label="Loading trip…" />}
       {isError && <ErrorBanner message="Trip not found." />}
       {trip && <TripResults trip={trip} />}
     </div>

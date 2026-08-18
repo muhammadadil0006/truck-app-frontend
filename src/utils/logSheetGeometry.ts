@@ -7,6 +7,12 @@ export interface GridGeometry {
   padLeft: number;
   padRight: number;
   padTop: number;
+  /** Top of the 4 duty-status rows — padTop plus a dedicated header gap, so
+   * row 1 (Off Duty) doesn't sit flush against the hour-axis labels the way
+   * it did when rows started right at padTop. Use this (not padTop) for any
+   * row-band math; padTop stays the anchor for the axis labels/ticks
+   * themselves. */
+  rowsTop: number;
   hourWidth: number;
   rowHeight: number;
   rowY: Record<DutyStatus, number>;
@@ -14,8 +20,9 @@ export interface GridGeometry {
 }
 
 const DEFAULT_PAD_LEFT = 140;
-const DEFAULT_PAD_RIGHT = 56; // reserved for the per-row "Total Hours" column, matching the real form
-const DEFAULT_PAD_TOP = 20;
+const DEFAULT_PAD_RIGHT = 84; // reserved for the per-row "Total Hours" column, matching the real form
+const DEFAULT_PAD_TOP = 28; // extra headroom for the raised end-of-day "Midnight" label (see LogSheetGrid)
+const HEADER_GAP = 12; // breathing room between the hour-axis row and row 1, matching the gap between rows
 const HOURS_PER_DAY = 24;
 const MINUTES_PER_DAY = 1440;
 const MS_PER_MINUTE = 60_000;
@@ -24,15 +31,27 @@ export function computeGridGeometry(width: number, height: number): GridGeometry
   const padLeft = DEFAULT_PAD_LEFT;
   const padRight = DEFAULT_PAD_RIGHT;
   const padTop = DEFAULT_PAD_TOP;
+  const rowsTop = padTop + HEADER_GAP;
   const hourWidth = (width - padLeft - padRight) / HOURS_PER_DAY;
-  const rowHeight = (height - padTop) / DUTY_STATUS_ROW_ORDER.length;
+  const rowHeight = (height - rowsTop) / DUTY_STATUS_ROW_ORDER.length;
 
   const rowY = {} as Record<DutyStatus, number>;
   DUTY_STATUS_ROW_ORDER.forEach((status, i) => {
-    rowY[status] = padTop + rowHeight * i + rowHeight / 2;
+    rowY[status] = rowsTop + rowHeight * i + rowHeight / 2;
   });
 
-  return { width, height, padLeft, padRight, padTop, hourWidth, rowHeight, rowY, gridRight: width - padRight };
+  return {
+    width,
+    height,
+    padLeft,
+    padRight,
+    padTop,
+    rowsTop,
+    hourWidth,
+    rowHeight,
+    rowY,
+    gridRight: width - padRight,
+  };
 }
 
 function xAtMinutesSinceMidnight(minutes: number, geometry: GridGeometry): number {

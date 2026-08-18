@@ -19,12 +19,28 @@ export interface LogSheetGridProps {
   height?: number;
 }
 
+// Label mapping only — purely cosmetic, doesn't touch any position/geometry
+// math below (still exactly 24 entries, one per hour 0-23). Real FMCSA
+// paper logs print the top axis as "Midnight 1 2 ... 11 Noon 1 2 ... 11"
+// (12-hour clock, repeating 1-11 for both halves of the day), not raw
+// 24-hour numbers — the grid's final column (the boundary after hour 23,
+// i.e. next midnight) gets its own "Midnight" label separately below.
 const HOUR_LABELS = [
   "Midnight", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11",
-  "Noon", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23",
+  "Noon", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11",
 ];
 
-export function LogSheetGrid({ allTransitions, logDate, totals, width = 920, height = 180 }: LogSheetGridProps) {
+// Structural/template ink — tinted teal so the grid reads as this app's own
+// letterhead rather than plain black-on-white, matching how many real ELD
+// forms print their pre-ruled template in a distinct color from the
+// driver's actual (black) entries. The recorded duty-status data below
+// (segmentLines/connectorLines/changePoints) stays solid black — that's the
+// one thing on this page that must never be mistaken for decoration.
+const GRID_TEXT_COLOR = "#0a7f7a";
+const GRID_LINE_STRONG = "#7dd0c9";
+const GRID_LINE_SOFT = "#c3ece8";
+
+export function LogSheetGrid({ allTransitions, logDate, totals, width = 1040, height = 180 }: LogSheetGridProps) {
   const geometry = useMemo(() => computeGridGeometry(width, height), [width, height]);
   const { segmentLines, connectorLines, changePoints } = useMemo(
     () => buildDayLines(allTransitions, logDate, geometry),
@@ -39,8 +55,9 @@ export function LogSheetGrid({ allTransitions, logDate, totals, width = 920, hei
         <text
           key={status}
           x={4}
-          y={geometry.padTop + geometry.rowHeight * i + geometry.rowHeight / 2}
+          y={geometry.rowsTop + geometry.rowHeight * i + geometry.rowHeight / 2}
           fontSize={11}
+          fill={GRID_TEXT_COLOR}
           dominantBaseline="middle"
         >
           {i + 1}. {DUTY_STATUS_LABEL[status]}
@@ -48,7 +65,7 @@ export function LogSheetGrid({ allTransitions, logDate, totals, width = 920, hei
       ))}
 
       {/* "Total Hours" column header */}
-      <text x={gridRight + 6} y={geometry.padTop - 6} fontSize={9} fontWeight="bold">
+      <text x={gridRight + 16} y={geometry.padTop - 6} fontSize={9} fontWeight="bold" fill={GRID_TEXT_COLOR}>
         Total
       </text>
 
@@ -61,9 +78,9 @@ export function LogSheetGrid({ allTransitions, logDate, totals, width = 920, hei
           key={`row-${status}`}
           x1={geometry.padLeft}
           x2={gridRight}
-          y1={geometry.padTop + geometry.rowHeight * i}
-          y2={geometry.padTop + geometry.rowHeight * i}
-          stroke="#d1d5db"
+          y1={geometry.rowsTop + geometry.rowHeight * i}
+          y2={geometry.rowsTop + geometry.rowHeight * i}
+          stroke={GRID_LINE_STRONG}
           strokeWidth={1}
           strokeDasharray="1 3"
         />
@@ -73,7 +90,7 @@ export function LogSheetGrid({ allTransitions, logDate, totals, width = 920, hei
         x2={gridRight}
         y1={height}
         y2={height}
-        stroke="#d1d5db"
+        stroke={GRID_LINE_STRONG}
         strokeWidth={1}
         strokeDasharray="1 3"
       />
@@ -82,10 +99,11 @@ export function LogSheetGrid({ allTransitions, logDate, totals, width = 920, hei
       {DUTY_STATUS_ROW_ORDER.map((status, i) => (
         <text
           key={`total-${status}`}
-          x={gridRight + 6}
-          y={geometry.padTop + geometry.rowHeight * i + geometry.rowHeight / 2}
+          x={gridRight + 16}
+          y={geometry.rowsTop + geometry.rowHeight * i + geometry.rowHeight / 2}
           fontSize={11}
           fontWeight="bold"
+          fill="black"
           dominantBaseline="middle"
         >
           {(totals[status] ?? 0).toFixed(2)}
@@ -99,7 +117,7 @@ export function LogSheetGrid({ allTransitions, logDate, totals, width = 920, hei
           3-4 (Driving, On Duty) rise up from the row's bottom wall. */}
       {DUTY_STATUS_ROW_ORDER.map((status, rowIndex) => {
         const anchorsFromTop = rowIndex < 2;
-        const rowTop = geometry.padTop + geometry.rowHeight * rowIndex;
+        const rowTop = geometry.rowsTop + geometry.rowHeight * rowIndex;
         const rowBottom = rowTop + geometry.rowHeight;
 
         return HOUR_LABELS.map((_, hour) =>
@@ -119,7 +137,7 @@ export function LogSheetGrid({ allTransitions, logDate, totals, width = 920, hei
                 x2={x}
                 y1={y1}
                 y2={y2}
-                stroke="#ccc"
+                stroke={GRID_LINE_SOFT}
                 strokeWidth={0.75}
               />
             );
@@ -127,18 +145,34 @@ export function LogSheetGrid({ allTransitions, logDate, totals, width = 920, hei
         );
       })}
 
-      {/* hourly tick marks + labels */}
+      {/* hourly tick marks + labels — "1" appears twice (AM and PM), so key
+          by index, not label text */}
       {HOUR_LABELS.map((label, hour) => {
         const x = geometry.padLeft + hour * geometry.hourWidth;
         return (
-          <g key={label}>
-            <line x1={x} x2={x} y1={geometry.padTop} y2={height} stroke="#ccc" strokeWidth={1} />
-            <text x={x} y={geometry.padTop - 6} fontSize={9} textAnchor="middle">
+          <g key={hour}>
+            <line x1={x} x2={x} y1={geometry.padTop} y2={height} stroke={GRID_LINE_STRONG} strokeWidth={1} />
+            <text x={x} y={geometry.padTop - 6} fontSize={9} fill={GRID_TEXT_COLOR} textAnchor="middle">
               {label}
             </text>
           </g>
         );
       })}
+
+      {/* grid's final boundary (next midnight) — closes the 24-hr axis on
+          the right. "Midnight" is a much wider label than a bare "11", so
+          it's raised onto its own line (smaller, offset up) instead of
+          sharing the hour-axis row — sharing that row squeezed it against
+          both the "11" tick to its left and the "Total" header to its
+          right. A short connector stub links the raised label straight
+          down to its own tick, so it can't read as floating over the
+          wrong column even though it's centered exactly on this x. */}
+      <g>
+        <line x1={gridRight} x2={gridRight} y1={geometry.padTop - 10} y2={height} stroke={GRID_LINE_STRONG} strokeWidth={1} />
+        <text x={gridRight} y={geometry.padTop - 16} fontSize={7.5} fill={GRID_TEXT_COLOR} textAnchor="middle">
+          Midnight
+        </text>
+      </g>
 
       {/* duty-status data: one horizontal line per segment (its own row,
           its own exact time span), one vertical line per real transition */}

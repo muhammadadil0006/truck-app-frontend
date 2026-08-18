@@ -13,6 +13,21 @@ const DAY_TOTAL_KEY: Record<DutyStatus, keyof DailyLog> = {
   [DutyStatus.OnDutyNotDriving]: "total_on_duty_hours",
 };
 
+/** What the DutyMixBar's segment colors mean — shown once above the day
+ * cards rather than repeated on every bar. */
+function DutyMixLegend() {
+  return (
+    <div className="flex flex-wrap gap-x-4 gap-y-1.5">
+      {DUTY_STATUS_ROW_ORDER.map((status) => (
+        <span key={status} className="flex items-center gap-1.5 text-xs text-ink-400">
+          <span className="size-2 shrink-0 rounded-full" style={{ background: DUTY_STATUS_COLOR[status] }} aria-hidden />
+          {DUTY_STATUS_LABEL[status]}
+        </span>
+      ))}
+    </div>
+  );
+}
+
 /** Proportional 24-hr duty-mix bar — a glanceable summary so every day card
  * carries real signal (not just a date), letting a driver scan the whole
  * trip's rest/drive rhythm before opening any single sheet. */
@@ -45,6 +60,8 @@ export function LogSheetPager({ trip }: { trip: Trip }) {
 
   return (
     <div className="space-y-4">
+      <DutyMixLegend />
+
       <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
         {dailyLogs.map((log, i) => {
           const isActive = i === activeIndex;

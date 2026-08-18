@@ -19,6 +19,15 @@ export function validateTripForm(form: TripFormState): TripFormErrors {
   if (!form.pickupLocation) errors.pickupLocation = SELECT_SUGGESTION_ERROR;
   if (!form.dropoffLocation) errors.dropoffLocation = SELECT_SUGGESTION_ERROR;
 
+  if (
+    form.pickupLocation &&
+    form.dropoffLocation &&
+    form.pickupLocation.lat === form.dropoffLocation.lat &&
+    form.pickupLocation.lng === form.dropoffLocation.lng
+  ) {
+    errors.dropoffLocation = "Dropoff must be different from the pickup location.";
+  }
+
   const cycleUsed = Number(form.cycleUsedHrs);
   if (form.cycleUsedHrs.trim() === "" || Number.isNaN(cycleUsed)) {
     errors.cycleUsedHrs = "Enter the hours already used in the current cycle.";

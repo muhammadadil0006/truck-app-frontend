@@ -26,9 +26,14 @@ export const DUTY_STATUS_LABEL: Record<DutyStatus, string> = {
   [DutyStatus.OnDutyNotDriving]: "On Duty (Not Driving)",
 };
 
+// Softer, app-matching shades (previously default Tailwind 600s, which read
+// as generic/off-brand against the teal control-tower theme) — reuses the
+// same hue family as constants/stopTypes.ts so the whole app draws from one
+// palette: green = resting well, violet = asleep, rose = active/critical,
+// sky = paused-but-working.
 export const DUTY_STATUS_COLOR: Record<DutyStatus, string> = {
-  [DutyStatus.OffDuty]: "#16a34a",
-  [DutyStatus.SleeperBerth]: "#7c3aed",
-  [DutyStatus.Driving]: "#dc2626",
-  [DutyStatus.OnDutyNotDriving]: "#2563eb",
+  [DutyStatus.OffDuty]: "#4ade80",
+  [DutyStatus.SleeperBerth]: "#a78bfa",
+  [DutyStatus.Driving]: "#fb7185",
+  [DutyStatus.OnDutyNotDriving]: "#38bdf8",
 };

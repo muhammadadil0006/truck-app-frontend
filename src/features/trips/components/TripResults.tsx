@@ -1,5 +1,6 @@
 import { CalendarDays, Clock, Route as RouteIcon } from "lucide-react";
 
+import { MapLegend } from "../../../components/map/MapLegend";
 import { RouteMap } from "../../../components/map/RouteMap";
 import { LogSheetPager } from "../../../components/logsheet/LogSheetPager";
 import { formatHours, formatMiles } from "../../../utils/format";
@@ -34,8 +35,11 @@ export function TripResults({ trip }: { trip: Trip }) {
         ))}
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-ink-700 shadow-panel">
-        <RouteMap routeGeometry={trip.route_geometry} stops={trip.stops} />
+      <div className="flex flex-col gap-4 sm:flex-row">
+        <div className="min-w-0 flex-1 overflow-hidden rounded-2xl border border-ink-700 shadow-panel">
+          <RouteMap routeGeometry={trip.route_geometry} stops={trip.stops} />
+        </div>
+        <MapLegend />
       </div>
 
       <div>
