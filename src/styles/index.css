@@ -1,1 +1,211 @@
 @import "tailwindcss";
+
+/* ---------------------------------------------------------------------
+   "Control tower" theme — deep charcoal shell + electric teal accent,
+   Chakra Petch display type over IBM Plex Sans/Mono body & data type.
+   Palette lifted from the assignment's spotter.ai reference point.
+   ------------------------------------------------------------------- */
+@theme {
+  --color-ink-950: #05080b;
+  --color-ink-900: #0a0f14;
+  --color-ink-850: #0e141b;
+  --color-ink-800: #131a22;
+  --color-ink-700: #1a232d;
+  --color-ink-600: #242f3b;
+  --color-ink-500: #3a4756;
+  --color-ink-400: #5b6b7d;
+  --color-ink-300: #8a97a3;
+  --color-ink-200: #b8c2cb;
+  --color-ink-100: #e3e8ec;
+  --color-ink-50: #f4f7f8;
+
+  --color-teal-950: #042f2e;
+  --color-teal-900: #053f3f;
+  --color-teal-800: #075f5c;
+  --color-teal-700: #0a7f7a;
+  --color-teal-600: #0b9f9e;
+  --color-teal-500: #16babd;
+  --color-teal-400: #3fd2ce;
+  --color-teal-300: #76d3d2;
+  --color-teal-200: #a6e6e2;
+  --color-teal-100: #d3f4f0;
+
+  --font-sans: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  --font-display: "Chakra Petch", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", monospace;
+
+  --shadow-glow: 0 0 0 1px rgba(22, 186, 189, 0.25), 0 0 24px -4px rgba(22, 186, 189, 0.35);
+  --shadow-glow-lg: 0 0 0 1px rgba(22, 186, 189, 0.3), 0 8px 40px -8px rgba(22, 186, 189, 0.45);
+  --shadow-panel: 0 1px 0 0 rgba(255, 255, 255, 0.04) inset, 0 20px 50px -20px rgba(0, 0, 0, 0.6);
+  --shadow-paper: 0 2px 4px rgba(0, 0, 0, 0.15), 0 24px 48px -14px rgba(0, 0, 0, 0.55);
+
+  --animate-fade-up: fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-fade-in: fade-in 0.5s ease-out both;
+  --animate-scale-in: scale-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-pulse-glow: pulse-glow 2.2s ease-in-out infinite;
+  --animate-shimmer: shimmer 2.5s linear infinite;
+  --animate-dash-draw: dash-draw 0.7s ease-out forwards;
+  --animate-spin-slow: spin 2.4s linear infinite;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes pulse-glow {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+@keyframes shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+@keyframes dash-draw {
+  from {
+    stroke-dashoffset: 32;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Stagger children of any `.stagger` container using their DOM order — used
+   for the trip form fields and stat tiles reveal-on-mount. */
+.stagger > * {
+  animation: fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.stagger > *:nth-child(1) {
+  animation-delay: 0ms;
+}
+.stagger > *:nth-child(2) {
+  animation-delay: 60ms;
+}
+.stagger > *:nth-child(3) {
+  animation-delay: 120ms;
+}
+.stagger > *:nth-child(4) {
+  animation-delay: 180ms;
+}
+.stagger > *:nth-child(5) {
+  animation-delay: 240ms;
+}
+.stagger > *:nth-child(6) {
+  animation-delay: 300ms;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--color-ink-900);
+  color: var(--color-ink-100);
+}
+
+/* Faint route-line atmosphere behind the app shell — a dotted diagonal
+   drift plus a soft teal radial glow anchored top-left, evoking a routing
+   map without literally drawing one. Fixed so it reads as the room, not
+   page content. */
+.app-atmosphere {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(60rem 40rem at 12% -10%, rgba(22, 186, 189, 0.16), transparent 60%),
+    radial-gradient(50rem 36rem at 100% 0%, rgba(22, 186, 189, 0.08), transparent 55%),
+    repeating-linear-gradient(
+      115deg,
+      rgba(255, 255, 255, 0.025) 0px,
+      rgba(255, 255, 255, 0.025) 1px,
+      transparent 1px,
+      transparent 64px
+    );
+}
+
+/* Custom scrollbar to match the dark shell. */
+* {
+  scrollbar-color: var(--color-ink-500) transparent;
+  scrollbar-width: thin;
+}
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-ink-600);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+/* Leaflet dark-theme overrides — the tile layer itself stays true-color
+   (it's a real map), but chrome (popups, zoom control) matches the shell. */
+.leaflet-container {
+  background: var(--color-ink-850);
+  font-family: var(--font-sans);
+}
+.leaflet-popup-content-wrapper {
+  background: var(--color-ink-800);
+  color: var(--color-ink-100);
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow-panel);
+}
+.leaflet-popup-tip {
+  background: var(--color-ink-800);
+}
+.leaflet-popup-close-button {
+  color: var(--color-ink-300) !important;
+}
+.leaflet-control-zoom a {
+  background: var(--color-ink-800) !important;
+  color: var(--color-ink-100) !important;
+  border-color: var(--color-ink-600) !important;
+}
+.leaflet-control-zoom a:hover {
+  background: var(--color-ink-700) !important;
+  color: var(--color-teal-300) !important;
+}
+.leaflet-control-attribution {
+  background: rgba(10, 15, 20, 0.75) !important;
+  color: var(--color-ink-300) !important;
+}
+.leaflet-control-attribution a {
+  color: var(--color-teal-300) !important;
+}

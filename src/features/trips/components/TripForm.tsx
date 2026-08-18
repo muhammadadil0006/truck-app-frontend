@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
+import { Gauge, MapPin, Navigation, Send } from "lucide-react";
 
 import { Button } from "../../../components/ui/Button";
 import { ErrorBanner } from "../../../components/ui/ErrorBanner";
@@ -53,48 +54,59 @@ export function TripForm({ onSubmit, isLoading, errorMessage }: TripFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 rounded-lg border border-gray-200 bg-white p-4">
-      <LocationAutocomplete
-        id="currentLocation"
-        label="Current location"
-        placeholder="Start typing a city…"
-        value={form.currentLocation}
-        onChange={(loc) => setForm((prev) => ({ ...prev, currentLocation: loc }))}
-        error={errors.currentLocation}
-      />
-      <LocationAutocomplete
-        id="pickupLocation"
-        label="Pickup location"
-        placeholder="Start typing a city…"
-        value={form.pickupLocation}
-        onChange={(loc) => setForm((prev) => ({ ...prev, pickupLocation: loc }))}
-        error={errors.pickupLocation}
-      />
-      <LocationAutocomplete
-        id="dropoffLocation"
-        label="Dropoff location"
-        placeholder="Start typing a city…"
-        value={form.dropoffLocation}
-        onChange={(loc) => setForm((prev) => ({ ...prev, dropoffLocation: loc }))}
-        error={errors.dropoffLocation}
-      />
-      <TripFormField
-        id="cycleUsedHrs"
-        label="Current cycle used (hrs)"
-        type="number"
-        min={0}
-        max={MAX_CYCLE_HOURS}
-        step={0.5}
-        placeholder="e.g. 10"
-        value={form.cycleUsedHrs}
-        onChange={(e) => setForm((prev) => ({ ...prev, cycleUsedHrs: e.target.value }))}
-        error={errors.cycleUsedHrs}
-        helperText={`Hours you've already logged on-duty in your rolling ${MAX_CYCLE_HOURS}-hour/8-day cycle. Once this trip pushes your total past ${MAX_CYCLE_HOURS}, a mandatory 34-hour restart is scheduled automatically.`}
-      />
+    <form
+      onSubmit={handleSubmit}
+      className="animate-fade-up relative space-y-5 rounded-2xl border border-ink-700 bg-ink-800/40 p-6 shadow-panel backdrop-blur-sm sm:p-7"
+    >
+      <div className="pointer-events-none absolute inset-x-4 top-0 h-px bg-gradient-to-r from-transparent via-teal-400/70 to-transparent" />
+
+      <div className="stagger grid gap-4 sm:grid-cols-2">
+        <LocationAutocomplete
+          id="currentLocation"
+          label="Current location"
+          placeholder="Start typing a city…"
+          value={form.currentLocation}
+          onChange={(loc) => setForm((prev) => ({ ...prev, currentLocation: loc }))}
+          error={errors.currentLocation}
+          icon={<Navigation className="size-4" aria-hidden />}
+        />
+        <LocationAutocomplete
+          id="pickupLocation"
+          label="Pickup location"
+          placeholder="Start typing a city…"
+          value={form.pickupLocation}
+          onChange={(loc) => setForm((prev) => ({ ...prev, pickupLocation: loc }))}
+          error={errors.pickupLocation}
+          icon={<MapPin className="size-4" aria-hidden />}
+        />
+        <LocationAutocomplete
+          id="dropoffLocation"
+          label="Dropoff location"
+          placeholder="Start typing a city…"
+          value={form.dropoffLocation}
+          onChange={(loc) => setForm((prev) => ({ ...prev, dropoffLocation: loc }))}
+          error={errors.dropoffLocation}
+          icon={<MapPin className="size-4" aria-hidden />}
+        />
+        <TripFormField
+          id="cycleUsedHrs"
+          label="Current cycle used (hrs)"
+          type="number"
+          min={0}
+          max={MAX_CYCLE_HOURS}
+          step={0.5}
+          placeholder="e.g. 10"
+          value={form.cycleUsedHrs}
+          onChange={(e) => setForm((prev) => ({ ...prev, cycleUsedHrs: e.target.value }))}
+          error={errors.cycleUsedHrs}
+          helperText={`Hours already logged on-duty in the rolling ${MAX_CYCLE_HOURS}-hr/8-day cycle. Past ${MAX_CYCLE_HOURS}, a 34-hr restart is scheduled automatically.`}
+          icon={<Gauge className="size-4" aria-hidden />}
+        />
+      </div>
 
       {errorMessage && <ErrorBanner message={errorMessage} />}
 
-      <Button type="submit" isLoading={isLoading} className="w-full">
+      <Button type="submit" isLoading={isLoading} loadingText="Planning trip…" className="w-full" icon={<Send className="size-4" aria-hidden />}>
         Plan Trip
       </Button>
     </form>

@@ -1,8 +1,13 @@
+import { Truck } from "lucide-react";
+
 export function Spinner({ label = "Loading…" }: { label?: string }) {
   return (
-    <div className="flex items-center gap-2 text-gray-500" role="status" aria-live="polite">
-      <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600" />
-      <span>{label}</span>
+    <div className="animate-fade-in flex items-center gap-3 text-sm text-ink-300" role="status" aria-live="polite">
+      <div className="relative size-7 shrink-0">
+        <div className="absolute inset-0 rounded-full border-2 border-ink-600 border-t-teal-400 animate-spin" />
+        <Truck className="absolute inset-0 m-auto size-3.5 text-teal-300" aria-hidden />
+      </div>
+      <span className="font-display tracking-wide">{label}</span>
     </div>
   );
 }

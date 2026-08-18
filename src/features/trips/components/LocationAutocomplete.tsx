@@ -1,4 +1,7 @@
 import { useEffect, useState } from "react";
+import type { ReactNode } from "react";
+import { Loader2, MapPin } from "lucide-react";
+import clsx from "clsx";
 
 import { POPULAR_CITIES } from "../../../constants/popularCities";
 import { useDebouncedValue } from "../../../utils/useDebouncedValue";
@@ -12,6 +15,7 @@ export interface LocationAutocompleteProps {
   value: ResolvedLocation | null;
   onChange: (location: ResolvedLocation | null) => void;
   error?: string;
+  icon?: ReactNode;
 }
 
 const MIN_QUERY_LENGTH = 3;
@@ -33,6 +37,7 @@ export function LocationAutocomplete({
   value,
   onChange,
   error,
+  icon,
 }: LocationAutocompleteProps) {
   const [inputText, setInputText] = useState(value?.text ?? "");
   const [isFocused, setIsFocused] = useState(false);
@@ -61,38 +66,50 @@ export function LocationAutocomplete({
   const showDropdown = showPopularCities || showLiveResults;
 
   return (
-    <div className="relative">
-      <label htmlFor={id} className="mb-1 block text-sm font-medium text-gray-700">
+    <div className={clsx("relative", showDropdown && "z-30")}>
+      <label htmlFor={id} className="mb-1.5 block font-display text-xs font-semibold tracking-wider text-ink-300 uppercase">
         {label}
       </label>
-      <input
-        id={id}
-        type="text"
-        autoComplete="off"
-        placeholder={placeholder}
-        value={inputText}
-        onChange={(e) => {
-          setInputText(e.target.value);
-          if (value !== null) onChange(null); // stale resolved value, force re-pick
-        }}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setTimeout(() => setIsFocused(false), 150)} // let onMouseDown fire first
-        className={`w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-          error ? "border-red-400" : "border-gray-300"
-        }`}
-      />
-      {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+      <div className="relative">
+        {icon && (
+          <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-ink-400 peer-focus:text-teal-400">
+            {icon}
+          </span>
+        )}
+        <input
+          id={id}
+          type="text"
+          autoComplete="off"
+          placeholder={placeholder}
+          value={inputText}
+          onChange={(e) => {
+            setInputText(e.target.value);
+            if (value !== null) onChange(null); // stale resolved value, force re-pick
+          }}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setTimeout(() => setIsFocused(false), 150)} // let onMouseDown fire first
+          className={clsx(
+            "peer w-full rounded-xl border bg-ink-800/60 py-2.5 text-sm text-ink-50 placeholder:text-ink-400/70 transition-all duration-200 focus:bg-ink-800 focus:outline-none",
+            icon ? "pr-3 pl-10" : "px-3",
+            error
+              ? "border-red-500/50 focus:border-red-400 focus:ring-2 focus:ring-red-500/20"
+              : "border-ink-600 focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20"
+          )}
+        />
+      </div>
+      {error && <p className="mt-1.5 text-xs text-red-300">{error}</p>}
 
       {isFetching && isFocused && !showPopularCities && (
-        <p className="absolute z-10 mt-1 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-xs text-gray-400 shadow-sm">
+        <p className="animate-fade-in absolute z-30 mt-1.5 flex w-full items-center gap-2 rounded-xl border border-ink-600 bg-ink-800 px-3 py-2 text-xs text-ink-400 shadow-panel">
+          <Loader2 className="size-3.5 animate-spin text-teal-400" aria-hidden />
           Searching…
         </p>
       )}
 
       {showDropdown && (
-        <ul className="absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-md border border-gray-200 bg-white shadow-lg">
+        <ul className="animate-scale-in absolute z-30 mt-1.5 max-h-56 w-full origin-top overflow-auto rounded-xl border border-ink-600 bg-ink-800 py-1 shadow-panel">
           {showPopularCities && (
-            <li className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-gray-400">
+            <li className="px-3 py-1.5 font-display text-[10px] font-semibold tracking-wider text-ink-400 uppercase">
               Popular cities
             </li>
           )}
@@ -104,8 +121,9 @@ export function LocationAutocomplete({
                   setInputText(s.label);
                   onChange({ text: s.label, lat: s.lat, lng: s.lng });
                 }}
-                className="block w-full px-3 py-2 text-left text-sm hover:bg-blue-50"
+                className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-ink-100 transition-colors hover:bg-teal-500/10 hover:text-teal-200"
               >
+                <MapPin className="size-3.5 shrink-0 text-ink-400" aria-hidden />
                 {s.label}
               </button>
             </li>

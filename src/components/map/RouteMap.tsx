@@ -38,16 +38,14 @@ export function RouteMap({ routeGeometry, stops }: RouteMapProps) {
   );
 
   return (
-    <MapContainer
-      center={DEFAULT_MAP_CENTER}
-      zoom={DEFAULT_MAP_ZOOM}
-      scrollWheelZoom
-      className="h-[480px] w-full rounded-lg"
-    >
+    <MapContainer center={DEFAULT_MAP_CENTER} zoom={DEFAULT_MAP_ZOOM} scrollWheelZoom className="h-[480px] w-full">
       <FitBoundsOnData bounds={bounds} />
       <TileLayer url={MAP_TILE_URL} attribution={MAP_TILE_ATTRIBUTION} />
       {routeGeometry.length > 0 && (
-        <GeoJSON data={lineFeature} pathOptions={{ color: "#2563eb", weight: 4 }} />
+        <GeoJSON
+          data={lineFeature}
+          pathOptions={{ color: "#16babd", weight: 4, opacity: 0.9 }}
+        />
       )}
       {stops.map((stop, i) => (
         <Marker key={`${stop.type}-${i}`} position={[stop.lat, stop.lng]} icon={buildStopIcon(stop.type)}>

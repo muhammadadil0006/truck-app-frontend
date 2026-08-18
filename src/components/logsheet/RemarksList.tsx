@@ -1,4 +1,4 @@
-import { DutyStatus } from "../../constants/dutyStatus";
+import { DUTY_STATUS_COLOR, DutyStatus } from "../../constants/dutyStatus";
 import type { Transition } from "../../features/trips/types";
 import { formatTime } from "../../utils/time";
 
@@ -24,11 +24,19 @@ export function RemarksList({ transitions }: { transitions: Transition[] }) {
   if (transitions.length === 0) return null;
 
   return (
-    <ul className="space-y-1 text-sm">
+    <ul className="space-y-1.5 text-sm">
       {transitions.map((t, i) => (
-        <li key={`${t.time}-${i}`}>
-          <span className="text-gray-500">{formatTime(t.time)}</span> — {describe(t)}
-          {t.location_text && <span className="text-gray-500">, {t.location_text}</span>}
+        <li key={`${t.time}-${i}`} className="flex items-baseline gap-2">
+          <span
+            className="mt-1 size-1.5 shrink-0 rounded-full"
+            style={{ background: DUTY_STATUS_COLOR[t.to_status] }}
+            aria-hidden
+          />
+          <span className="font-mono text-xs text-ink-500">{formatTime(t.time)}</span>
+          <span className="text-ink-900">
+            {describe(t)}
+            {t.location_text && <span className="text-ink-500">, {t.location_text}</span>}
+          </span>
         </li>
       ))}
     </ul>

@@ -10,10 +10,10 @@ export const StopType = {
 
 export type StopType = (typeof StopType)[keyof typeof StopType];
 
-export const STOP_TYPE_STYLE: Record<StopType, { color: string; glyph: string; label: string }> = {
-  [StopType.Pickup]: { color: "#16a34a", glyph: "P", label: "Pickup" },
-  [StopType.Dropoff]: { color: "#dc2626", glyph: "D", label: "Dropoff" },
-  [StopType.Fuel]: { color: "#f59e0b", glyph: "⛽", label: "Fuel Stop" },
-  [StopType.Rest10Hr]: { color: "#2563eb", glyph: "🛏", label: "10-Hr Rest" },
-  [StopType.Restart34Hr]: { color: "#7c3aed", glyph: "⟳", label: "34-Hr Restart" },
+export const STOP_TYPE_STYLE: Record<StopType, { color: string; label: string }> = {
+  [StopType.Pickup]: { color: "#34d399", label: "Pickup" },
+  [StopType.Dropoff]: { color: "#fb7185", label: "Dropoff" },
+  [StopType.Fuel]: { color: "#fbbf24", label: "Fuel Stop" },
+  [StopType.Rest10Hr]: { color: "#38bdf8", label: "10-Hr Rest" },
+  [StopType.Restart34Hr]: { color: "#a78bfa", label: "34-Hr Restart" },
 };

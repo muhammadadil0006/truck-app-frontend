@@ -5,11 +5,11 @@ import type { Transition } from "../../features/trips/types";
  * it. Gated by VITE_SHOW_DEBUG_PANEL — see constants/debug.ts. */
 export function TransitionsDebugPanel({ transitions }: { transitions: Transition[] }) {
   return (
-    <div className="w-full max-w-sm shrink-0 rounded-lg border border-amber-300 bg-amber-50 p-3">
-      <p className="mb-2 text-xs font-semibold uppercase text-amber-700">
+    <div className="w-full max-w-sm shrink-0 rounded-xl border border-amber-500/30 bg-amber-500/10 p-3">
+      <p className="mb-2 text-xs font-semibold tracking-wide text-amber-400 uppercase">
         Debug: transitions ({transitions.length})
       </p>
-      <pre className="max-h-[420px] overflow-auto whitespace-pre-wrap break-words text-[11px] leading-snug text-amber-900">
+      <pre className="max-h-[420px] overflow-auto font-mono text-[11px] leading-snug whitespace-pre-wrap break-words text-amber-200">
         {JSON.stringify(transitions, null, 2)}
       </pre>
     </div>

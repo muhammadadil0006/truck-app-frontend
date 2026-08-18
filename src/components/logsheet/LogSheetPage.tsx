@@ -15,7 +15,9 @@ export interface LogSheetPageProps {
 }
 
 /** One full ELD log sheet: header fields + grid + remarks, per CLAUDE.md's
- * "Daily Log Sheet — Required Fields & Layout" section. */
+ * "Daily Log Sheet — Required Fields & Layout" section. Rendered as a literal
+ * white paper sheet — deliberate contrast against the app's dark shell — to
+ * read as an authentic DOT-inspectable document rather than another UI card. */
 export function LogSheetPage({ trip, dailyLog }: LogSheetPageProps) {
   const totals = {
     [DutyStatus.OffDuty]: dailyLog.total_off_duty_hours,
@@ -35,33 +37,43 @@ export function LogSheetPage({ trip, dailyLog }: LogSheetPageProps) {
 
   return (
     <div className="flex flex-wrap items-start gap-4">
-      <div className="min-w-0 flex-1 space-y-4 rounded-lg border border-gray-200 bg-white p-4">
-        {/* Header fields */}
-        <div className="grid grid-cols-1 gap-x-6 gap-y-1 text-sm sm:grid-cols-2">
+      <div className="min-w-0 flex-1 rounded-2xl border border-ink-700 bg-ink-800/30 p-3 shadow-panel sm:p-4">
+        <div className="space-y-4 rounded-xl bg-white p-4 text-ink-900 shadow-paper sm:p-5">
+          {/* Header fields */}
+          <div className="grid grid-cols-1 gap-x-6 gap-y-1 border-b border-ink-200 pb-3 text-sm sm:grid-cols-2">
+            <div>
+              <p className="font-display font-bold text-ink-900">
+                Driver's Daily Log — {formatDate(dailyLog.log_date)}
+              </p>
+              <p className="text-ink-500">
+                {trip.pickup_location_text} → {trip.dropoff_location_text}
+              </p>
+              <p className="text-ink-500">Carrier: {LOG_SHEET_DEFAULTS.carrierName}</p>
+              <p className="text-ink-500">Main office: {LOG_SHEET_DEFAULTS.mainOfficeAddress}</p>
+              <p className="text-ink-500">Shipping doc no.: {LOG_SHEET_DEFAULTS.shippingDocNumber}</p>
+            </div>
+            <div className="font-mono text-xs text-ink-500 sm:text-right">
+              <p>Vehicle: {LOG_SHEET_DEFAULTS.truckTrailerNumber}</p>
+              <p>Total miles driving today: {dailyLog.total_miles_today} mi</p>
+              <p>Total mileage today: Not tracked</p>
+              <p>Driver: {LOG_SHEET_DEFAULTS.driverName} (certified true and correct)</p>
+              <p>Co-driver: {LOG_SHEET_DEFAULTS.coDriverName || "None"}</p>
+              <p>Time zone: {LOG_SHEET_DEFAULTS.homeTerminalTimeZone}</p>
+            </div>
+          </div>
+
+          <div className="-mx-1 overflow-x-auto px-1">
+            <div className="min-w-[640px]">
+              <LogSheetGrid allTransitions={allTransitions} logDate={dailyLog.log_date} totals={totals} />
+            </div>
+          </div>
+
           <div>
-            <p className="font-semibold">Driver's Daily Log — {formatDate(dailyLog.log_date)}</p>
-            <p className="text-gray-500">{trip.pickup_location_text} → {trip.dropoff_location_text}</p>
-            <p className="text-gray-500">Carrier: {LOG_SHEET_DEFAULTS.carrierName}</p>
-            <p className="text-gray-500">Main office: {LOG_SHEET_DEFAULTS.mainOfficeAddress}</p>
-            <p className="text-gray-500">Shipping doc no.: {LOG_SHEET_DEFAULTS.shippingDocNumber}</p>
+            <p className="mb-1 text-xs font-semibold tracking-wide text-ink-500 uppercase">
+              Remarks (pickup, dropoff, breaks, rest, fuel, and location at every duty-status change)
+            </p>
+            <RemarksList transitions={dailyLog.transitions} />
           </div>
-          <div className="text-gray-500 sm:text-right">
-            <p>Vehicle: {LOG_SHEET_DEFAULTS.truckTrailerNumber}</p>
-            <p>Total miles driving today: {dailyLog.total_miles_today} mi</p>
-            <p>Total mileage today: Not tracked</p>
-            <p>Driver: {LOG_SHEET_DEFAULTS.driverName} (certified true and correct)</p>
-            <p>Co-driver: {LOG_SHEET_DEFAULTS.coDriverName || "None"}</p>
-            <p>Time zone: {LOG_SHEET_DEFAULTS.homeTerminalTimeZone}</p>
-          </div>
-        </div>
-
-        <LogSheetGrid allTransitions={allTransitions} logDate={dailyLog.log_date} totals={totals} />
-
-        <div>
-          <p className="mb-1 text-xs font-semibold uppercase text-gray-500">
-            Remarks (pickup, dropoff, breaks, rest, fuel, and location at every duty-status change)
-          </p>
-          <RemarksList transitions={dailyLog.transitions} />
         </div>
       </div>
 

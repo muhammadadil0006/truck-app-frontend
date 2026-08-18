@@ -1,5 +1,3 @@
-import { Link } from "react-router-dom";
-
 import { Spinner } from "../../../components/ui/Spinner";
 import { TripForm } from "../components/TripForm";
 import { TripResults } from "../components/TripResults";
@@ -9,12 +7,18 @@ export function PlanTripPage() {
   const [planTrip, { data: trip, isLoading, isError, error }] = usePlanTripMutation();
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6 p-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">ELD Trip Planner</h1>
-        <Link to="/history" className="text-sm text-blue-600 hover:underline">
-          Trip History
-        </Link>
+    <div className="space-y-8">
+      <div className="animate-fade-up max-w-2xl">
+        <p className="font-display text-xs font-semibold tracking-[0.25em] text-teal-400 uppercase">
+          Property-carrying · 70hr/8-day cycle
+        </p>
+        <h1 className="mt-2 font-display text-3xl font-bold tracking-tight text-ink-50 sm:text-4xl">
+          Plan an HOS-compliant route
+        </h1>
+        <p className="mt-2 text-sm text-ink-300">
+          Enter the trip's stops and current cycle hours — Convoy routes it, schedules rests and fuel stops, and
+          drafts the FMCSA daily logs for every day on the road.
+        </p>
       </div>
 
       <TripForm
@@ -23,7 +27,11 @@ export function PlanTripPage() {
         errorMessage={isError ? extractErrorMessage(error) : undefined}
       />
 
-      {isLoading && <Spinner label="Planning your trip…" />}
+      {isLoading && (
+        <div className="flex justify-center py-6">
+          <Spinner label="Planning your trip…" />
+        </div>
+      )}
       {trip && <TripResults trip={trip} />}
     </div>
   );
